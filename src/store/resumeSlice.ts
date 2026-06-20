@@ -146,9 +146,20 @@ const createDefaultResume = (name: string): Resume => ({
   data: JSON.parse(JSON.stringify(SAMPLE_RESUME_DATA))
 });
 
+const initialDefaultResume: Resume = {
+  id: "resume_default",
+  name: "Sample Software Engineer Resume",
+  template: "template-modern",
+  font: "Arial, sans-serif",
+  fontSize: "11pt",
+  themeColor: "theme-navy",
+  language: "en",
+  data: JSON.parse(JSON.stringify(SAMPLE_RESUME_DATA))
+};
+
 const initialState: ResumeState = {
-  resumes: [],
-  activeResumeId: ""
+  resumes: [initialDefaultResume],
+  activeResumeId: "resume_default"
 };
 
 export const resumeSlice = createSlice({

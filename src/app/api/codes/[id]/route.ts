@@ -4,8 +4,8 @@ import { ObjectId } from "mongodb";
 
 // Verify admin authorization header
 function isAuthorized(req: NextRequest) {
-  const authHeader = req.headers.get("x-admin-password");
-  const adminPass = process.env.ADMIN_PASSWORD || "admin123";
+  const authHeader = (req.headers.get("x-admin-password") || "").trim();
+  const adminPass = (process.env.ADMIN_PASSWORD || "admin123").trim();
   return authHeader === adminPass;
 }
 
