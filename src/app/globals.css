@@ -1,0 +1,398 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Premium Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.5);
+}
+
+/* ==========================================================================
+   RESUME TEMPLATE RENDERING STYLES (A4 Paper Sheet Mockup)
+   ========================================================================== */
+.resume-sheet {
+  background: #ffffff;
+  color: #1e293b;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 20mm;
+  margin: 0 auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Typography elements */
+.resume-sheet h1 {
+  font-size: 24pt;
+  font-weight: 800;
+  margin: 0 0 4pt 0;
+  color: #0f172a;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.resume-sheet h2.resume-section-title {
+  font-size: 13pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 16pt;
+  margin-bottom: 8pt;
+  padding-bottom: 3pt;
+  border-bottom: 2px solid #cbd5e1;
+  color: #1e3a8a; /* Configured by accents */
+}
+
+.resume-sheet p, 
+.resume-sheet li {
+  font-size: 10pt;
+  line-height: 1.5;
+  color: #334155;
+  margin-bottom: 4pt;
+}
+
+.resume-sheet a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+/* Header Wrappers & Rounded Photos */
+.preview-header-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 12pt;
+  padding-bottom: 10pt;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.preview-header-text {
+  flex: 1;
+}
+
+.preview-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6pt 12pt;
+  font-size: 8.5pt;
+  color: #475569;
+  margin-top: 6pt;
+}
+
+.preview-contact-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2pt;
+}
+
+.preview-contact-item strong {
+  color: #334155;
+}
+
+.preview-photo {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e2e8f0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.job-title {
+  font-size: 13pt;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.25px;
+}
+
+/* Experience & Education Items */
+.preview-item {
+  margin-bottom: 10pt;
+  page-break-inside: avoid;
+}
+
+.preview-item-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 10.5pt;
+  color: #0f172a;
+}
+
+.preview-item-sub {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9.5pt;
+  color: #475569;
+  font-style: italic;
+  margin-bottom: 2pt;
+}
+
+.preview-item-desc ul {
+  margin: 4pt 0;
+  padding-left: 14pt;
+  list-style-type: disc;
+}
+
+.preview-item-desc li {
+  margin-bottom: 2pt;
+  line-height: 1.4;
+}
+
+/* Skills Grid */
+.preview-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8pt;
+}
+
+.preview-skill-group {
+  page-break-inside: avoid;
+}
+
+.preview-skill-cat {
+  font-weight: 700;
+  font-size: 9.5pt;
+  color: #0f172a;
+  margin-bottom: 1pt;
+}
+
+.preview-skill-list {
+  font-size: 9pt;
+  color: #475569;
+  line-height: 1.4;
+}
+
+/* Custom Sections */
+.preview-custom-content ul {
+  padding-left: 14pt;
+  list-style-type: disc;
+}
+.preview-custom-content li {
+  margin-bottom: 2pt;
+}
+
+/* RTL Mode override */
+.rtl-mode {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.rtl-mode .preview-header-wrapper {
+  flex-direction: row-reverse;
+}
+
+.rtl-mode .preview-item-header,
+.rtl-mode .preview-item-sub,
+.rtl-mode .preview-contact {
+  flex-direction: row-reverse;
+}
+
+.rtl-mode .preview-item-desc ul,
+.rtl-mode .preview-custom-content ul {
+  padding-left: 0;
+  padding-right: 14pt;
+}
+
+/* ==========================================================================
+   THEME COLOR ACCENTS
+   ========================================================================== */
+.theme-navy h2.resume-section-title {
+  color: #1e3a8a;
+  border-bottom-color: #1e3a8a;
+}
+.theme-navy .job-title { color: #3b82f6; }
+
+.theme-dark h2.resume-section-title {
+  color: #1e293b;
+  border-bottom-color: #1e293b;
+}
+.theme-dark .job-title { color: #64748b; }
+
+.theme-slate h2.resume-section-title {
+  color: #475569;
+  border-bottom-color: #475569;
+}
+.theme-slate .job-title { color: #94a3b8; }
+
+.theme-emerald h2.resume-section-title {
+  color: #064e3b;
+  border-bottom-color: #064e3b;
+}
+.theme-emerald .job-title { color: #10b981; }
+
+.theme-burgundy h2.resume-section-title {
+  color: #701a75;
+  border-bottom-color: #701a75;
+}
+.theme-burgundy .job-title { color: #d946ef; }
+
+/* ==========================================================================
+   TEMPLATE LAYOUT STYLES
+   ========================================================================== */
+
+/* 1. Classic Elite */
+.template-classic {
+  padding: 24mm 20mm;
+}
+.template-classic h2.resume-section-title {
+  border-bottom: 1.5px solid #475569;
+  text-align: center;
+}
+
+/* 2. Modern Corporate */
+.template-modern {
+  border-top: 6px solid #1e3a8a; /* accents will override */
+}
+.template-modern.theme-navy { border-top-color: #1e3a8a; }
+.template-modern.theme-dark { border-top-color: #1e293b; }
+.template-modern.theme-slate { border-top-color: #475569; }
+.template-modern.theme-emerald { border-top-color: #064e3b; }
+.template-modern.theme-burgundy { border-top-color: #701a75; }
+
+/* 3. Minimalist Elite */
+.template-minimal {
+  padding: 15mm;
+}
+.template-minimal h2.resume-section-title {
+  border-bottom: none;
+  border-left: 3px solid #1e293b;
+  padding-left: 6pt;
+}
+.rtl-mode.template-minimal h2.resume-section-title {
+  border-left: none;
+  border-right: 3px solid #1e293b;
+  padding-left: 0;
+  padding-right: 6pt;
+}
+
+/* 4. Technical Developer */
+.template-tech {
+  font-family: monospace !important;
+}
+.template-tech h1 {
+  font-size: 20pt;
+  letter-spacing: -1px;
+}
+.template-tech h2.resume-section-title {
+  border-bottom: 1px dashed #64748b;
+}
+
+/* 5. Executive Leader */
+.template-executive h1 {
+  font-size: 26pt;
+  text-align: center;
+}
+.template-executive .job-title {
+  text-align: center;
+}
+.template-executive .preview-contact {
+  justify-content: center;
+}
+.template-executive .preview-header-wrapper {
+  flex-direction: column;
+  text-align: center;
+}
+
+/* 6. Ivy League Centered */
+.template-ivyleague h1 {
+  font-size: 22pt;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.template-ivyleague .job-title {
+  text-align: center;
+  font-style: italic;
+  font-size: 11pt;
+  margin-top: 2pt;
+}
+.template-ivyleague .preview-header-wrapper {
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  border-bottom: 2px solid #0f172a;
+}
+.template-ivyleague .preview-contact {
+  justify-content: center;
+  gap: 4pt 8pt;
+  font-size: 9pt;
+}
+.template-ivyleague .preview-contact-item::after {
+  content: ' | ';
+  margin-left: 8pt;
+  color: #cbd5e1;
+}
+.template-ivyleague .preview-contact-item:last-child::after {
+  content: '';
+}
+.rtl-mode.template-ivyleague .preview-contact-item::after {
+  content: ' | ';
+  margin-right: 8pt;
+  margin-left: 0;
+}
+.template-ivyleague h2.resume-section-title {
+  border-bottom: 1px solid #0f172a;
+  text-align: center;
+}
+
+/* ==========================================================================
+   PRINT LAYOUT OVERRIDES (Suppress headers/footers and margins)
+   ========================================================================== */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  /* Suppress everything except the paper sheet */
+  .no-print {
+    display: none !important;
+  }
+  
+  .resume-sheet {
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    min-height: 0 !important;
+  }
+  
+  /* Zero margins to suppress URL stamps */
+  @page {
+    margin: 0;
+  }
+  
+  /* Safe padding for print sheet inside margins */
+  body {
+    padding: 20mm;
+  }
+}
