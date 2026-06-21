@@ -22,8 +22,8 @@ export default function PaymentModal({ isOpen, onClose }: PaymentModalProps) {
   const [isScriptLoaded, setIsScriptLoaded] = useState<boolean>(false);
 
   // Config parameters
-  const OWNER_WHATSAPP = "963955123456";
-  const SHAMCASH_WALLET = "0963-955-123-456";
+  const OWNER_WHATSAPP = "+963957277945";
+  const SHAMCASH_WALLET = "d307844b89989b9659e3fc47ff8c4722";
 
   // Pre-filled WhatsApp message for buying codes
   const cvIdText = activeResume ? `(ID: ${activeResume.id})` : '';
