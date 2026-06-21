@@ -195,14 +195,16 @@ export default function Navbar({ onOpenPaymentModal }: NavbarProps) {
         </button>
 
         {/* Admin Link */}
-        <Link 
-          href="/admin" 
-          target="_blank"
-          className="text-xs text-slate-400 hover:text-slate-200 underline font-semibold"
-          title="Go to private code generator dashboard"
-        >
-          Control Panel
-        </Link>
+       {/* Admin Link */}
+{/* <Link
+  href="/admin"
+  target="_blank"
+  className="text-xs text-slate-400 hover:text-slate-200 underline font-semibold"
+  title="Go to private code generator dashboard"
+>
+  Control Panel
+</Link>
+*/}
       </div>
     </header>
   );
