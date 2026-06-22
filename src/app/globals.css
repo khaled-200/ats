@@ -365,40 +365,126 @@ body {
 }
 
 /* ==========================================================================
-   PRINT LAYOUT OVERRIDES (Suppress headers/footers and margins)
+   PRINT LAYOUT OVERRIDES (Full content, A4 Paper, Multiple Pages)
    ========================================================================== */
 @media print {
-  body {
+  /* 1. Global Reset & Print Colors */
+  html, body {
     background: #ffffff !important;
     color: #000000 !important;
-  }
-  
-  /* Suppress everything except the paper sheet */
-  .no-print {
-    display: none !important;
-  }
-  
-  .resume-sheet {
-    box-shadow: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
     margin: 0 !important;
     padding: 0 !important;
-    width: 100% !important;
-    min-height: 0 !important;
   }
   
-  /* Zero margins to suppress URL stamps */
+  /* Suppress everything except the paper sheet wrapper path */
+  .no-print,
+  nav,
+  aside,
+  header,
+  footer,
+  button,
+  .payment-modal,
+  input,
+  textarea,
+  select {
+    display: none !important;
+  }
+
+  /* 2. Reset flex/grid/overflow/height limits on all parent divs of the preview sheet */
+  /* This prevents the browser from clipping the printed document to a single screen height */
+  html, 
+  body, 
+  body > div, 
+  body > div > div, 
+  body > div > div > div, 
+  body > div > div > div > div, 
+  body > div > div > div > div > div, 
+  body > div > div > div > div > div > div, 
+  .paper-viewport {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    width: auto !important;
+    transform: none !important;
+  }
+
+  /* 3. Style the A4 sheet for high-fidelity multi-page rendering */
+  .resume-sheet {
+    display: block !important;
+    position: relative !important;
+    width: 210mm !important; /* Fixed A4 Width */
+    min-height: 297mm !important; /* Fixed A4 Height */
+    height: auto !important; /* Grow naturally for multiple pages */
+    overflow: visible !important;
+    padding: 20mm !important; /* Standard margins on A4 paper */
+    margin: 0 auto !important; /* Centered in browser print dialog */
+    background: #ffffff !important;
+    color: #1e293b !important;
+    box-shadow: none !important;
+    border: none !important;
+    page-break-after: auto !important;
+    page-break-before: auto !important;
+  }
+  
+  /* Set A4 portrait size and zero margin for browser margin control */
   @page {
+    size: A4 portrait;
     margin: 0;
   }
   
-  /* Safe padding for print sheet inside margins */
-  body {
-    padding: 20mm;
+  /* Prevent items breaking awkwardly inside bullet lists or job experiences */
+  .preview-item {
+    page-break-inside: avoid !important;
+    page-break-after: auto !important;
+  }
+  
+  .resume-section {
+    page-break-inside: auto !important;
+    page-break-after: auto !important;
+  }
+
+  .resume-section-title {
+    page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Allow text to break nicely */
+  p, li, span, h1, h2, h3 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* 4. Paywall print protection */
+  .locked-preview {
+    display: none !important;
+  }
+  
+  .locked-print-warning {
+    display: block !important;
+    background: #ffffff !important;
+    color: #ef4444 !important;
+    padding: 3rem 2rem !important;
+    text-align: center !important;
+    border: 3px dashed #ef4444 !important;
+    border-radius: 12px !important;
+    font-family: sans-serif !important;
+    max-width: 500px !important;
   }
 }
 
 /* ==========================================================================
-   SCREENSHOT & PRINT SECURITY
+   SCREENSHOT SECURITY STYLES (SCREEN ONLY)
    ========================================================================== */
 .locked-preview {
   position: relative !important;
@@ -408,7 +494,6 @@ body {
   -ms-user-select: none !important;
 }
 
-/* Watermark pseudo-element covering the entire resume sheet */
 .locked-preview::after {
   content: "" !important;
   position: absolute !important;
@@ -432,23 +517,4 @@ body {
 
 .locked-print-warning {
   display: none;
-}
-
-@media print {
-  .locked-preview {
-    display: none !important;
-  }
-  
-  .locked-print-warning {
-    display: block !important;
-    background: #ffffff !important;
-    color: #ef4444 !important;
-    padding: 3rem 2rem !important;
-    text-align: center !important;
-    border: 3px dashed #ef4444 !important;
-    border-radius: 12px !important;
-    font-family: sans-serif !important;
-    max-width: 500px !important;
-    margin: 5rem auto !important;
-  }
 }
