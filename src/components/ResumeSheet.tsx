@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '@/store';
 import { ResumeData } from '@/store/resumeSlice';
 import { SECTION_TRANSLATIONS } from '@/lib/dictionaries';
@@ -31,7 +31,92 @@ const renderBulletPoints = (text: string) => {
 
 export default function ResumeSheet() {
   const { resumes, activeResumeId } = useAppSelector(state => state.resume);
+  const isUnlocked = useAppSelector(state => state.payment.isUnlocked);
   const activeResume = resumes.find(r => r.id === activeResumeId) || resumes[0];
+
+  const [isWindowFocused, setIsWindowFocused] = useState(true);
+
+  useEffect(() => {
+    if (isUnlocked) return;
+
+    const handleFocus = () => setIsWindowFocused(true);
+    const handleBlur = () => setIsWindowFocused(false);
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      const isEditing = 
+        activeEl?.tagName === 'INPUT' || 
+        activeEl?.tagName === 'TEXTAREA' || 
+        activeEl?.getAttribute('contenteditable') === 'true';
+
+      if (isEditing) return;
+
+      // Block Ctrl+P / Cmd+P
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        alert(activeResume?.language === 'ar' ? 'يرجى إلغاء قفل المستند لطباعته.' : 'Please unlock the document to print.');
+        return;
+      }
+      
+      // Block Ctrl+C / Cmd+C / Ctrl+X
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'x')) {
+        e.preventDefault();
+        alert(activeResume?.language === 'ar' ? 'نسخ النص معطل في المعاينة.' : 'Copying text is disabled in preview.');
+        return;
+      }
+
+      // Block F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+J, Ctrl+U
+      if (
+        e.key === 'F12' || 
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'C' || e.key === 'c' || e.key === 'J' || e.key === 'j')) ||
+        ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U'))
+      ) {
+        e.preventDefault();
+        return;
+      }
+    };
+
+    const handleContextMenu = (e: MouseEvent) => {
+      const activeEl = document.activeElement;
+      const isEditing = 
+        activeEl?.tagName === 'INPUT' || 
+        activeEl?.tagName === 'TEXTAREA';
+      
+      if (isEditing) return;
+
+      const previewArea = document.getElementById('resumePreviewSheet');
+      if (previewArea && previewArea.contains(e.target as Node)) {
+        e.preventDefault();
+      }
+    };
+
+    const handleCopy = (e: ClipboardEvent) => {
+      const activeEl = document.activeElement;
+      const isEditing = 
+        activeEl?.tagName === 'INPUT' || 
+        activeEl?.tagName === 'TEXTAREA';
+      
+      if (isEditing) return;
+
+      e.preventDefault();
+      alert(activeResume?.language === 'ar' ? 'نسخ النص معطل في المعاينة.' : 'Copying text is disabled in preview.');
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('contextmenu', handleContextMenu);
+    window.addEventListener('copy', handleCopy);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('copy', handleCopy);
+    };
+  }, [isUnlocked, activeResume?.language]);
 
   if (!activeResume) {
     return (
@@ -62,11 +147,44 @@ export default function ResumeSheet() {
     personal.website && { label: 'Website', value: personal.website }
   ].filter((x): x is { label: string; value: string } => !!x);
 
+  const isLocked = !isUnlocked;
+
   return (
-    <div className="paper-viewport w-full overflow-x-auto pb-8 flex justify-center">
+    <div className="paper-viewport w-full overflow-x-auto pb-8 flex justify-center relative">
+      {isLocked && !isWindowFocused && (
+        <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center text-center p-6 rounded-2xl select-none">
+          <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-2xl max-w-sm">
+            <div className="text-indigo-400 font-bold mb-2 flex items-center justify-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse" />
+              {isRtl ? 'حماية لقطة الشاشة نشطة' : 'Screen Capture Protection'}
+            </div>
+            <p className="text-slate-300 text-xs leading-relaxed">
+              {isRtl 
+                ? 'تم إخفاء المعاينة مؤقتاً لمنع لقطات الشاشة غير المصرح بها. انقر هنا للمتابعة.' 
+                : 'Preview is temporarily hidden to prevent unauthorized screenshots. Click inside the window to resume.'}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {isLocked && (
+        <div className="locked-print-warning hidden">
+          <h2 className="text-red-600 text-2xl font-bold uppercase mb-2">
+            {isRtl ? 'المستند مقفل' : 'DOCUMENT LOCKED'}
+          </h2>
+          <p className="text-slate-700 text-base">
+            {isRtl 
+              ? 'يرجى شراء رمز تفعيل لتنزيل أو طباعة السيرة الذاتية بصيغة PDF.' 
+              : 'Please unlock the document on the website to print or download as PDF.'}
+          </p>
+        </div>
+      )}
+
       <div 
         id="resumePreviewSheet"
-        className={`resume-sheet ${template} ${themeColor} ${isRtl ? 'rtl-mode' : ''}`}
+        className={`resume-sheet ${template} ${themeColor} ${isRtl ? 'rtl-mode' : ''} ${
+          isLocked ? 'locked-preview' : ''
+        } ${isLocked && !isWindowFocused ? 'blurred-content' : ''}`}
         style={sheetStyle}
         dir={isRtl ? 'rtl' : 'ltr'}
       >
