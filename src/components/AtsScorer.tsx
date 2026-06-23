@@ -5,7 +5,7 @@ import { updateResumeData } from '@/store/resumeSlice';
 import { 
   ACTION_VERBS, CLICHE_BUZZWORDS, GRAMMAR_DICT, RESUME_DICT
 } from '@/lib/dictionaries';
-import { CheckCircle2, AlertTriangle, XCircle, Sparkles, Search, ExternalLink } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, XCircle, Sparkles, Search, ExternalLink, Copy } from 'lucide-react';
 
 const LANGUAGES_NATIONALITIES = [
   'english', 'arabic', 'french', 'german', 'spanish', 'italian', 'japanese', 'chinese', 'customs', 'turkish', 'russian', 'portuguese', 'hindi', 'swedish', 'dutch',
@@ -48,8 +48,9 @@ export default function AtsScorer() {
   const activeResume = resumes.find(r => r.id === activeResumeId) || resumes[0];
 
   const [activeTab, setActiveTab] = useState<'ats' | 'enhancv' | 'proof'>('ats');
-  const [dictQuery, setDictQuery] = useState<string>('');
-  const [dictResult, setDictResult] = useState<React.ReactNode>('Type a word above to see offline translations.');
+  const [transText, setTransText] = useState<string>('');
+  const [transResult, setTransResult] = useState<string>('');
+  const [isTranslating, setIsTranslating] = useState<boolean>(false);
 
   if (!activeResume) return null;
 
@@ -397,45 +398,34 @@ export default function AtsScorer() {
   // ==========================================
   // 4. DICTIONARY GLOSSARY SEARCH LOGIC
   // ==========================================
-  const handleDictSearch = () => {
-    const q = dictQuery.trim().toLowerCase();
-    if (!q) {
-      setDictResult('Please type a word to search.');
+  const handleOnlineTranslate = async () => {
+    const text = transText.trim();
+    if (!text) {
+      setTransResult(isRtl ? 'يرجى كتابة نص للترجمة.' : 'Please type text to translate.');
       return;
     }
 
-    if (RESUME_DICT[q]) {
-      setDictResult(
-        <div>
-          Translation: <span className="font-bold text-emerald-400 text-base">{RESUME_DICT[q]}</span>
-        </div>
+    setIsTranslating(true);
+    try {
+      // Auto-detect language: if it contains Arabic script, translate ar -> en, else en -> ar
+      const hasArabic = /[\u0600-\u06FF]/.test(text);
+      const langpair = hasArabic ? 'ar|en' : 'en|ar';
+
+      const res = await fetch(
+        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langpair}`
       );
-      return;
-    }
+      const result = await res.json();
 
-    let matches: { en: string; ar: string }[] = [];
-    Object.keys(RESUME_DICT).forEach(key => {
-      if (key.includes(q) || RESUME_DICT[key].includes(q)) {
-        matches.push({ en: key, ar: RESUME_DICT[key] });
+      if (result.responseData && result.responseData.translatedText) {
+        setTransResult(result.responseData.translatedText);
+      } else {
+        setTransResult(isRtl ? 'فشلت الترجمة. حاول مرة أخرى.' : 'Translation failed. Try again.');
       }
-    });
-
-    if (matches.length > 0) {
-      setDictResult(
-        <div className="space-y-1.5 mt-2">
-          <div className="text-xs font-semibold text-slate-400">Found matches:</div>
-          <div className="max-h-24 overflow-y-auto space-y-1 pr-1 text-slate-200">
-            {matches.map((m, idx) => (
-              <div key={idx} className="flex justify-between border-b border-slate-900/60 pb-1 text-xs">
-                <span>{m.en}</span>
-                <span className="text-emerald-400 font-semibold">{m.ar}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    } else {
-      setDictResult('Word not found. Check spelling or try "Engineer" or "مهارات".');
+    } catch (err) {
+      console.error(err);
+      setTransResult(isRtl ? 'حدث خطأ في الاتصال بالخادم.' : 'Error connecting to the translation server.');
+    } finally {
+      setIsTranslating(false);
     }
   };
 
@@ -674,28 +664,56 @@ export default function AtsScorer() {
             )}
           </ul>
 
-          {/* Dictionary search */}
+          {/* Online Translator */}
           <div className="border-t border-slate-850 pt-4 space-y-2.5">
-            <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wide">🌐 Bilingual Translator Dictionary</h5>
-            <div className="flex gap-2">
-              <input 
-                type="text" 
-                value={dictQuery}
-                onChange={(e) => setDictQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleDictSearch()}
-                placeholder="Search keywords (e.g. Developer, Managed)..."
-                className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-indigo-500 text-slate-100"
+            <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wide flex items-center gap-1.5">
+              <span>🌐</span>
+              {isRtl ? 'المترجم الفوري الذكي (أونلاين)' : 'Online Smart Translator'}
+            </h5>
+            <p className="text-[10px] text-slate-500 m-0">
+              {isRtl 
+                ? 'يكتشف اللغة تلقائياً ويترجم بين العربية والإنجليزية' 
+                : 'Auto-detects languages and translates between English & Arabic'}
+            </p>
+            <div className="flex flex-col gap-2">
+              <textarea 
+                rows={2}
+                value={transText}
+                onChange={(e) => setTransText(e.target.value)}
+                placeholder={isRtl ? 'اكتب أي شيء هنا للترجمة...' : 'Type anything here to translate...'}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-indigo-500 text-slate-100 resize-none"
               />
-              <button 
-                onClick={handleDictSearch}
-                className="bg-slate-800 hover:bg-slate-750 border border-slate-700 px-3 rounded-lg flex items-center justify-center text-slate-200 transition-colors"
-              >
-                <Search size={14} />
-              </button>
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-[10px] text-indigo-400 font-semibold font-mono">
+                  {transText.trim() ? (
+                    /[\u0600-\u06FF]/.test(transText) ? 'Detect: Arabic ➔ English' : 'Detect: English ➔ Arabic'
+                  ) : ''}
+                </span>
+                <button 
+                  onClick={handleOnlineTranslate}
+                  disabled={isTranslating}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] px-4 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {isTranslating ? (isRtl ? 'جاري الترجمة...' : 'Translating...') : (isRtl ? 'ترجم' : 'Translate')}
+                </button>
+              </div>
             </div>
-            <div className="bg-slate-950 p-3 rounded-lg border border-slate-850 text-xs text-slate-400 leading-relaxed min-h-12 flex items-center justify-center text-center">
-              {dictResult}
-            </div>
+            
+            {transResult && (
+              <div className="bg-slate-950 p-3 rounded-lg border border-slate-850 text-xs text-slate-200 relative group min-h-[50px] flex flex-col justify-between">
+                <p className="m-0 pr-6 leading-relaxed select-text font-medium">{transResult}</p>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(transResult);
+                    alert(isRtl ? 'تم نسخ الترجمة!' : 'Translation copied to clipboard!');
+                  }}
+                  className="absolute top-2 right-2 text-slate-500 hover:text-slate-200 p-1.5 rounded-md hover:bg-slate-900 transition-colors"
+                  title="Copy Translation"
+                >
+                  <Copy size={12} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
