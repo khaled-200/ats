@@ -7,6 +7,35 @@ import {
 } from '@/lib/dictionaries';
 import { CheckCircle2, AlertTriangle, XCircle, Sparkles, Search, ExternalLink } from 'lucide-react';
 
+const LANGUAGES_NATIONALITIES = [
+  'english', 'arabic', 'french', 'german', 'spanish', 'italian', 'japanese', 'chinese', 'customs', 'turkish', 'russian', 'portuguese', 'hindi', 'swedish', 'dutch',
+  'syrian', 'lebanese', 'egyptian', 'jordanian', 'american', 'british', 'canadian', 'australian', 'indian', 'italian', 'spanish', 'german', 'french', 'japanese', 'chinese',
+  'nationalities', 'languages'
+];
+
+const capitalizeText = (text: string): string => {
+  if (!text) return '';
+  
+  let fixed = text;
+
+  // 1. Capitalize first letter of the entire text (if it starts with a letter)
+  fixed = fixed.replace(/^([a-z])/g, (m, c) => c.toUpperCase());
+
+  // 2. Capitalize first letter of sentences (after a period, question mark, or exclamation followed by spaces)
+  fixed = fixed.replace(/([.!?]\s+)([a-z])/g, (m, p, c) => p + c.toUpperCase());
+
+  // 3. Capitalize first letter of bullet points (lines starting with - or * or • followed by spaces and a lowercase letter)
+  fixed = fixed.replace(/(^|\n)([-*•]\s+)([a-z])/g, (m, p, prefix, c) => p + prefix + c.toUpperCase());
+
+  // 4. Capitalize common languages and nationalities (word-boundary case-insensitive match)
+  LANGUAGES_NATIONALITIES.forEach(word => {
+    const regex = new RegExp(`\\b${word}\\b`, 'gi');
+    fixed = fixed.replace(regex, word.charAt(0).toUpperCase() + word.slice(1));
+  });
+
+  return fixed;
+};
+
 interface ProofIssue {
   type: 'spacing' | 'capitalization' | 'typo' | 'passive';
   desc: string;
@@ -350,7 +379,11 @@ export default function AtsScorer() {
     });
 
     fieldRanges.forEach(r => {
-      r.update(updatedTexts[r.id]);
+      let finalVal = updatedTexts[r.id];
+      if (activeResume.language === 'en') {
+        finalVal = capitalizeText(finalVal);
+      }
+      r.update(finalVal);
     });
 
     dispatch(updateResumeData(fixedData));
