@@ -206,22 +206,6 @@ body {
   text-align: right !important;
 }
 
-.rtl-mode .preview-header-wrapper {
-  flex-direction: row-reverse;
-}
-
-.rtl-mode .preview-item-header,
-.rtl-mode .preview-item-sub,
-.rtl-mode .preview-contact {
-  flex-direction: row-reverse;
-}
-
-.rtl-mode .preview-item-desc ul,
-.rtl-mode .preview-custom-content ul {
-  padding-left: 0;
-  padding-right: 14pt;
-}
-
 /* ==========================================================================
    THEME COLOR ACCENTS
    ========================================================================== */

@@ -21,7 +21,7 @@ const renderBulletPoints = (text: string) => {
 
   if (items.length === 0) return null;
   return (
-    <ul className="list-disc pl-5 mt-1 mb-2 space-y-1">
+    <ul className="list-disc ps-5 mt-1 mb-2 space-y-1">
       {items.map((item, idx) => (
         <li key={idx} className="text-[10pt] text-slate-700 leading-relaxed">{item}</li>
       ))}
