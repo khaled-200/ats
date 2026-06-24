@@ -14,13 +14,22 @@ export default function WorkspacePage() {
   const dispatch = useAppDispatch();
   const [mounted, setMounted] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
-  const [showSplash, setShowSplash] = useState(true);
+  
+  // Intro & Splash Screen states
+  const [showIntro, setShowIntro] = useState(true);
+  const [introFade, setIntroFade] = useState(false);
+  const [showSplash, setShowSplash] = useState(false);
   const [splashFade, setSplashFade] = useState(false);
   const [progress, setProgress] = useState(0);
 
   // Sync client-side mounting to prevent hydration errors
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Timers for the Welcome screen (start only after the Intro is dismissed)
+  useEffect(() => {
+    if (showIntro || !showSplash) return;
 
     // Animate progress bar filling up
     const progressTimer = setTimeout(() => {
@@ -42,7 +51,23 @@ export default function WorkspacePage() {
       clearTimeout(fadeTimer);
       clearTimeout(hideTimer);
     };
-  }, []);
+  }, [showIntro, showSplash]);
+
+  const handleStartWorkspace = () => {
+    setIntroFade(true);
+    setTimeout(() => {
+      setShowIntro(false);
+      setShowSplash(true);
+    }, 500);
+  };
+
+  const handleSkipSplash = () => {
+    setProgress(100);
+    setSplashFade(true);
+    setTimeout(() => {
+      setShowSplash(false);
+    }, 500);
+  };
 
   // Select store states
   const { showEditor, showPreview, showScorer, showSettings } = useAppSelector(state => state.ui);
@@ -94,6 +119,48 @@ export default function WorkspacePage() {
 
   return (
     <>
+      {/* Intro Screen */}
+      {showIntro && (
+        <div 
+          className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-slate-950 p-6 text-center select-none transition-all duration-500 ease-out ${
+            introFade ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
+          }`}
+        >
+          {/* Glowing Ambient Background Orb */}
+          <div className="absolute w-[350px] h-[350px] bg-indigo-500/10 rounded-full blur-[90px] animate-pulse" />
+          <div className="absolute w-[250px] h-[250px] bg-purple-500/5 rounded-full blur-[80px] delay-700 animate-pulse" />
+
+          {/* Intro Content */}
+          <div className="relative flex flex-col items-center justify-center max-w-3xl">
+            {/* Elegant Icon */}
+            <div className="bg-gradient-to-tr from-indigo-600 to-purple-600 p-4 rounded-3xl text-white shadow-xl shadow-indigo-500/10 mb-8 scale-90 animate-pulse">
+              <FileDown size={40} />
+            </div>
+
+            {/* Arabic Main Phrase */}
+            <h2 className="text-xl md:text-2xl font-black text-slate-100 leading-relaxed mb-4 text-center max-w-2xl" dir="rtl">
+              استمتع بتجربة مجانية واصنع سيرتك الذاتيّة الخاصة بك وفقاً للنظام العالمي الحديث والمزوّد بالذكاء الاصطناعي
+            </h2>
+
+            {/* English Small Translation */}
+            <p className="text-xs md:text-sm text-slate-400 leading-relaxed mb-10 max-w-xl">
+              Enjoy a free experience and make your CV to the modern global system and artificial intelligence
+            </p>
+
+            {/* Skip/Continue Action Button */}
+            <button
+              onClick={handleStartWorkspace}
+              className="relative group overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs px-8 py-3.5 rounded-2xl shadow-xl shadow-indigo-600/20 transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center gap-2"
+            >
+              <span>ابدأ الآن / Start Now</span>
+              <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Splash Screen */}
       {showSplash && (
         <div 
@@ -127,6 +194,16 @@ export default function WorkspacePage() {
                 style={{ width: `${progress}%` }}
               />
             </div>
+
+            {/* Skipping Option */}
+            <button
+              onClick={handleSkipSplash}
+              className={`mt-6 px-4 py-1.5 rounded-full border border-slate-850 bg-slate-900/60 text-slate-400 hover:text-slate-200 hover:border-slate-700 text-[10px] font-semibold tracking-wider uppercase transition-all duration-300 backdrop-blur-sm active:scale-95 transition-opacity duration-300 ${
+                splashFade ? 'opacity-0 pointer-events-none' : 'opacity-100'
+              }`}
+            >
+              Skip / تخطي
+            </button>
           </div>
         </div>
       )}
