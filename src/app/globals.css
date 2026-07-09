@@ -502,3 +502,21 @@ body {
 .locked-print-warning {
   display: none;
 }
+
+@media print {
+    .skiptranslate,
+    #goog-gt-tt,
+    .goog-te-banner-frame,
+    #goog-gt-,
+    .goog-te-balloon-frame,
+    iframe.goog-te-banner-frame {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+    }
+    body {
+        top: 0 !important;
+        position: static !important;
+    }
+}
