@@ -520,3 +520,36 @@ body {
         position: static !important;
     }
 }
+
+/* Custom Print Settings for A4 Sheets to Prevent Text Clipping */
+@media print {
+    /* Enforces true A4 dimensions and sets safe top/bottom margins */
+    @page {
+        size: A4;
+        margin: 20mm 15mm 20mm 15mm; /* 20mm top/bottom margin acts as a safety zone */
+    }
+
+    /* Prevents headings or full sections from splitting across two pages */
+    h1, h2, h3, h4, h5, h6, .section, section {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Keeps headings attached to the content that follows them */
+    h1, h2, h3, h4 {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+    }
+
+    /* Prevents list items, paragraphs, or individual experience blocks from breaking mid-sentence */
+    ul li, ol li, .resume-item, tr, p {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Resets any unexpected layout shifts */
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
