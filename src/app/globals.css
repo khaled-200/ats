@@ -553,3 +553,16 @@ body {
         padding: 0 !important;
     }
 }
+
+@media print {
+    /* (Keep your existing print rules above this) */
+
+    /* Force the entire custom section block to stay together */
+    .section,
+    section,
+    [class*="custom-section"],
+    div:has(> h1), div:has(> h2), div:has(> h3), div:has(> h4) {
+        page-break-inside: avoid !important;
+        break-inside: avoid-page !important;
+    }
+}
