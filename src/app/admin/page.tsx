@@ -92,34 +92,31 @@ export default function AdminPage() {
 
   // Generate a code
   const handleGenerateCode = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsGenLoading(true);
-    setErrorMessage('');
+  e.preventDefault();
+  setIsGenLoading(true);
+  setErrorMessage('');
 
-    try {
-      const response = await fetch('/api/codes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-admin-password': password
-        },
-        body: JSON.stringify({ note: note.trim() })
-      });
+  try {
+    const response = await fetch('/api/codes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ note: note ? note.trim() : "Client Code" }),
+    });
 
-      const data = await response.json();
-      if (response.ok && data.success) {
-        setCodes(prev => [data.code, ...prev]);
-        setNote('');
-      } else {
-        setErrorMessage(data.error || "Failed to generate code.");
-      }
-    } catch (err) {
-      console.error(err);
-      setErrorMessage("Network error generating code.");
-    } finally {
-      setIsGenLoading(false);
+    if (response.ok) {
+      setNote('');
+      fetchCodes();
+    } else {
+      setErrorMessage('Failed to generate code');
     }
-  };
+  } catch (error) {
+    setErrorMessage('Network error');
+  } finally {
+    setIsGenLoading(false);
+  }
+};
 
   // Delete a code
   const handleDeleteCode = async (id: string, codeVal: string) => {
