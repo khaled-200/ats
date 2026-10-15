@@ -15,7 +15,7 @@ interface CodeDocument {
 }
 
 export default function AdminPage() {
-  const [password, setPassword] = useState<string>('');
+  const [password, setPassword] = useState<string>('khaled2006');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
   const [isLoginLoading, setIsLoginLoading] = useState<boolean>(false);
   
