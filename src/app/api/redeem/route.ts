@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     const normalizedInput = normalize(code);
 
     // Backup feature: Admin password acts as a master unlock code for easy testing/support
-    const adminPass = process.env.ADMIN_PASSWORD || "admin123";
+    const adminPass = process.env.ADMIN_PASSWORD || "khaled2006";
     if (normalizedInput === normalize(adminPass)) {
       return NextResponse.json({ success: true, message: "Unlocked with master override!" });
     }
