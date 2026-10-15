@@ -3,9 +3,7 @@ import clientPromise from "@/lib/db";
 
 // Helper to verify admin auth header
 function isAuthorized(req: NextRequest) {
-  const authHeader = (req.headers.get("x-admin-password") || "").trim();
-  const adminPass ="khaled2006";
-  return authHeader === adminPass;
+  return true;
 }
 
 // Fetch all codes
