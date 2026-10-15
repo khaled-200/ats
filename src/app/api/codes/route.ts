@@ -1,17 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/db";
 
-// Helper to verify admin auth header
-function isAuthorized(req: NextRequest) {
-  return true;
-}
-
-// Fetch all codes
 export async function GET(req: NextRequest) {
-  if (!isAuthorized(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     const client = await clientPromise;
     const db = client.db();
@@ -22,41 +12,33 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// Generate new code
 export async function POST(req: NextRequest) {
   try {
-    const { note } = await req.json();
-    
-    // Generate a random, easy-to-read coupon code: CV-XXXX-XXXX
-    // We avoid confusing letters like I, O, 0, 1
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; 
-    const genBlock = (len: number) => {
-      let s = "";
-      for (let i = 0; i < len; i++) {
-        s += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return s;
+    let note = "Client Code";
+    try {
+      const body = await req.json();
+      if (body && body.note) note = body.note;
+    } catch (e) {}
+
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let randomCode = "CV-";
+    for (let i = 0; i < 8; i++) {
+      randomCode += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    const newCode = {
+      code: randomCode,
+      note: note,
+      isUsed: false,
+      createdAt: new Date().toISOString(),
     };
-    
-    const fullCode = `CV-${genBlock(4)}-${genBlock(4)}`;
-    const normalized = fullCode.replace(/[^A-Z0-9]/g, "").toUpperCase();
 
     const client = await clientPromise;
     const db = client.db();
+    await db.collection("codes").insertOne(newCode);
 
-    const newCodeDoc = {
-      code: fullCode,
-      normalizedCode: normalized,
-      isRedeemed: false,
-      redeemedAt: null,
-      createdAt: new Date(),
-      note: note || ""
-    };
-
-    await db.collection("codes").insertOne(newCodeDoc);
-
-    return NextResponse.json({ success: true, code: newCodeDoc });
-  } catch (error) {
-    return NextResponse.json({ error: "Database error" }, { status: 500 });
+    return NextResponse.json({ success: true, code: newCode });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || "Failed" }, { status: 500 });
   }
 }
